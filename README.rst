@@ -1,0 +1,1 @@
+glloader is a generated code snippet that allows to load OpenGL and extensions with a single file.
