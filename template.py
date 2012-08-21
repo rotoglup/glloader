@@ -1,7 +1,33 @@
 import ctypes
 
-path = r"M:\bin\vc8\release\rtguGL.dll"
-_rtgugl = ctypes.WinDLL(path)
+import ctypes
+
+def _findDLL():
+  
+  import os
+  import platform
+  import sys
+  
+  # Look in sys.path
+  #
+  if platform.system() == "Windows":    
+    RTGU_MODULE_NAMES = [
+      "rtguGL.dll",
+      "rtguGL-d.dll"    
+    ]
+  
+  for path in sys.path:
+    for moduleName in RTGU_MODULE_NAMES:
+      modulePath = os.path.join( path, moduleName )
+      if os.path.exists( modulePath ):
+        _rtgugl = ctypes.WinDLL( modulePath )
+        return _rtgugl
+  
+  # Not found in sys.path, let ctypes handle the module name itself
+  #
+  return ctypes.WinDLL( RTGU_MODULE_NAMES[0] )
+
+_rtgugl = _findDLL()
 
 GLchar = ctypes.c_char
 GLcharARB = ctypes.c_char
@@ -51,16 +77,16 @@ GLDEBUGPROCARB = ctypes.WINFUNCTYPE(None, GLenum,GLenum,GLuint,GLenum,GLsizei,ct
 GLDEBUGPROCAMD = ctypes.WINFUNCTYPE(None, GLuint,GLenum,GLenum,GLsizei,ctypes.POINTER(GLchar),ctypes.c_void_p)
 GLDEBUGPROC = ctypes.WINFUNCTYPE(None, GLenum,GLenum,GLuint,GLenum,GLsizei,ctypes.POINTER(GLchar),ctypes.c_void_p)
 
-def GL_EXT(name):
-  name = "SUPPORTS_" + name
+def GL_EXT(ext_name):
+  name = "SUPPORTS_" + ext_name
   def supports_fn():
     return ctypes.c_int.in_dll(_rtgugl, name)
-  globals()[name] = supports_fn
+  return supports_fn
 
 def GL_PROC(catname, resType, name, args):
   fn_type = ctypes.WINFUNCTYPE(resType, *args)
   fn = fn_type.in_dll(_rtgugl, name)
-  globals()[name] = fn
+  return fn
   
 # GENERATED CODE
 
@@ -81,10 +107,3 @@ def GL_PROC(catname, resType, name, args):
 """
 %(WGL_commands)s
 """
-
-#
-
-for n in dir():
-  if n.startswith("SUPP"):
-    print n, globals()[n]
-

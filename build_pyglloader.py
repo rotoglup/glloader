@@ -1,3 +1,7 @@
+"""
+Build a glloader.py that allows to use functions from 'glloader.c' when they are exported from a DLL.
+"""
+
 import re
 
 RE_VOID_PTR = re.compile("(?i)^\s*(void|GLvoid)\s*\*\s*$")
@@ -47,8 +51,9 @@ def formatCommand(category_name, spec, typemap, cmd):
     return None
   
   returnType = typemap.get(cmd.returnType, cmd.returnType)
+  cmdIdentifier = "%s%s" % (cmd.namespace, cmd.name)
   
-  return "GL_PROC('%s', %s, '%s%s', (%s))" % (category_name, formatTypeName(returnType), cmd.namespace, cmd.name, formatCommandArguments(typemap, cmd))
+  return "%s = GL_PROC('%s', %s, '%s', (%s))" % (cmdIdentifier, category_name, formatTypeName(returnType), cmdIdentifier, formatCommandArguments(typemap, cmd))
 
 
 def formatEnum(spec, enum):
@@ -115,7 +120,7 @@ def formatGL(spec, typemap):
     output = result.setdefault( outputKey(category, "categories"), [] )
     
     name = formatIdentifier(category.id, category.namespace)
-    output.append( "GL_EXT('%s')" % name )
+    output.append( "SUPPORTS_%s = GL_EXT('%s')" % (name, name) )
     
   for category in categories:
     
