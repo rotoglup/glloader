@@ -1,4 +1,4 @@
-> OpenGL *spec* files are now obsolete, replaced by [xml files](https://github.com/KhronosGroup/OpenGL-Registry) for some time
+> OpenGL *spec* files are now obsolete, replaced by `xml files <https://github.com/KhronosGroup/OpenGL-Registry>`_ for some time
 
 **glloader** is a generated code snippet that allows to load OpenGL and extensions with a single file, see ``glloader\glloader.c``.
 
